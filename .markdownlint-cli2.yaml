@@ -7,3 +7,7 @@ ignores:
   - node_modules
   - CHANGELOG.md
   - .claude
+  # OpenSpec's own planning/archive artifacts start with `## Why`/`## Purpose`
+  # by the tool's own template convention, not a top-level `#` heading -
+  # content nobody reads as prose, not this repo's own documentation.
+  - "openspec/**"
