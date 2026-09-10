@@ -8,6 +8,18 @@ secret from a self-hosted [Hush Hush](https://github.com/alrayyes/Hush-Hush)
 secrets object store, masking both the age identity and the fetched value
 before either can reach a log.
 
+## Requirements
+
+- A running [hush-hush](https://github.com/alrayyes/Hush-Hush) server,
+  reachable from the runner.
+- An age keypair whose private key can decrypt the object you're fetching
+  (`age-keygen`) - store the private key as a repo (or org) secret, never a
+  literal in the workflow file.
+- The runner is Linux or macOS, amd64 or arm64 - `hush-hush-cli` ships no
+  Windows release this action installs.
+- The exact `hush-hush-cli` release tag you want installed (`cli-version`) -
+  see [its releases](https://github.com/alrayyes/hush-hush-cli/releases).
+
 ## Usage
 
 ```yaml

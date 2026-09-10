@@ -32,6 +32,12 @@ commit-msg:
       run: bunx commitlint --edit {1}
 
 # pre-push never writes - every job below runs in check mode.
+#
+# tests/integration/run.sh is deliberately CI-only, not a pre-push job:
+# it spins up three real containers (hush-hush, Forgejo, a Forgejo Actions
+# runner) and takes over a minute, versus low single-digit seconds for
+# everything else here. Run it by hand before a push that touches
+# action.yml or scripts/ - CI runs it unconditionally either way.
 pre-push:
   parallel: true
   jobs:

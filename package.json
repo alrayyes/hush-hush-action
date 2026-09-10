@@ -11,6 +11,9 @@
     "prettier": "3.9.6"
   },
   "trustedDependencies": ["lefthook"],
+  "overrides": {
+    "smol-toml": "1.8.0"
+  },
   "scripts": {
     "prepare": "lefthook install",
     "format:check": "prettier --check \"**/*.{md,yml,yaml}\"",
