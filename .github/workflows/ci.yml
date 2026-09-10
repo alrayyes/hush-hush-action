@@ -71,8 +71,11 @@ jobs:
         run: |
           git clone --quiet --depth 1 --branch v1.14.0 https://github.com/bats-core/bats-core.git /tmp/bats-core
           sudo /tmp/bats-core/install.sh /usr/local
+      # --formatter junit, not the default: this file feeds Codecov Test
+      # Analytics below. Needs bats 1.10.0+, which is why this job pins an
+      # exact bats-core release rather than Ubuntu's 1.2.1.
       - name: bats
-        run: bats tests/*.bats
+        run: bats --formatter junit tests/*.bats > junit-out.xml
       - name: Install kcov
         run: |
           sudo apt-get update
@@ -88,6 +91,18 @@ jobs:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: coverage-out/*/cobertura.xml
           fail_ci_if_error: true
+      # Codecov Test Analytics: per-test failure/flake detail, not just a
+      # coverage delta. `!cancelled()`, not `always()` or the step default -
+      # this still runs when the `bats` step above failed (junit-out.xml
+      # exists either way; that's the case Test Analytics is actually for),
+      # but not if the whole run was cancelled out from under it.
+      - name: Upload test results
+        if: ${{ !cancelled() }}
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: junit-out.xml
+          report-type: test_results
 
   # Real containers, no mocking: a real hush-hush server, a real Forgejo
   # instance, and a real Forgejo Actions runner, exercising this action the
