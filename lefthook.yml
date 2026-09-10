@@ -33,16 +33,17 @@ commit-msg:
 
 # pre-push never writes - every job below runs in check mode.
 #
-# tests/integration/run.sh is deliberately CI-only, not a pre-push job:
-# it spins up three real containers (hush-hush, Forgejo, a Forgejo Actions
-# runner) and takes over a minute, versus low single-digit seconds for
-# everything else here. Run it by hand before a push that touches
-# action.yml or scripts/ - CI runs it unconditionally either way.
+# tests/integration/run.sh and tests/coverage.sh are deliberately CI-only,
+# not pre-push jobs: the former spins up three real containers and the
+# latter installs kcov and bats-core fresh inside an ubuntu:22.04 container
+# every run - both take over a minute, versus low single-digit seconds for
+# everything else here. Run either by hand before a push that touches
+# action.yml or scripts/ - CI runs both unconditionally either way.
 pre-push:
   parallel: true
   jobs:
     - name: shellcheck
-      run: shellcheck -x scripts/*.sh tests/integration/*.sh
+      run: shellcheck -x scripts/*.sh tests/integration/*.sh tests/coverage.sh
 
     - name: actionlint
       run: actionlint

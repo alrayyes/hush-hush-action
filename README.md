@@ -1,6 +1,7 @@
 # Hush Hush Action
 
 [![CI](https://github.com/alrayyes/hush-hush-action/actions/workflows/ci.yml/badge.svg)](https://github.com/alrayyes/hush-hush-action/actions)
+[![Codecov](https://codecov.io/gh/alrayyes/hush-hush-action/graph/badge.svg)](https://codecov.io/gh/alrayyes/hush-hush-action)
 [![licence](https://img.shields.io/badge/licence-GPL--3.0-blue)](LICENSE)
 
 A composite GitHub/Forgejo Actions action that fetches and decrypts one
@@ -87,7 +88,12 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
   server, a real Forgejo instance, and a real Forgejo Actions runner, all in
   Docker. Pushes a fixture repo that uses this action via `uses: ./` and
   asserts the run actually succeeds with the right value. Needs `docker`,
-  `curl`, `jq`, `age-keygen`, and `git`.
+  `curl`, `jq`, `age-keygen`, and `git`. This is also what exercises
+  `scripts/install.sh` and `scripts/get.sh` - the coverage below doesn't
+  measure them.
+- `tests/coverage.sh` - line coverage for `scripts/lib.sh` via `kcov`,
+  uploaded to [Codecov](https://codecov.io/gh/alrayyes/hush-hush-action).
+  Runs inside an `ubuntu:22.04` container (kcov isn't packaged for 24.04).
 
 ## Licence
 
