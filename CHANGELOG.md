@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.2](https://github.com/alrayyes/hush-hush-action/compare/v1.2.1...v1.2.2) (2026-09-10)
+
+
+### Bug Fixes
+
+* **ci:** gate release auto-merge on label, merge with RELEASE_TOKEN ([#22](https://github.com/alrayyes/hush-hush-action/issues/22)) ([957ce0d](https://github.com/alrayyes/hush-hush-action/commit/957ce0db5d629ba2a8a76b18ed3a8ab347d1d05d)), closes [#21](https://github.com/alrayyes/hush-hush-action/issues/21)
+
 ## [1.2.1](https://github.com/alrayyes/hush-hush-action/compare/v1.2.0...v1.2.1) (2026-09-10)
 
 
