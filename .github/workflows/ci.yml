@@ -104,6 +104,30 @@ jobs:
           files: junit-out.xml
           report-type: test_results
 
+  # Grammar, spelling, the phonetic article - mechanics have a right answer,
+  # so this fails the build. The job's own container is ghcr.io's
+  # ltex-cli-plus image, so lint-ltex.sh finds the CLI already on PATH and
+  # skips fetching anything.
+  mechanics:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    container:
+      image: ghcr.io/alrayyes/ltex-cli-plus:18.7.0@sha256:00c30809802234d6c43b0ce0b295075bd0aff9c576aaba57433bc8baf314398c
+      options: --entrypoint ""
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: ./scripts/lint-ltex.sh
+
+  # Style: house voice, weasel words, corporate speak. Advice rather than a
+  # verdict - MinAlertLevel in .vale.ini prints it, and only Vale.Terms
+  # (error severity) takes the job down.
+  style:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - run: ./scripts/lint-vale.sh
+
   # Real containers, no mocking: a real hush-hush server, a real Forgejo
   # instance, and a real Forgejo Actions runner, exercising this action the
   # way an actual pipeline would (tests/integration/run.sh).
