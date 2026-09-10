@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.2.1](https://github.com/alrayyes/hush-hush-action/compare/v1.2.0...v1.2.1) (2026-09-10)
+
+
+### Bug Fixes
+
+* **ci:** match release-please's real actor when auto-merging ([#19](https://github.com/alrayyes/hush-hush-action/issues/19)) ([89fd325](https://github.com/alrayyes/hush-hush-action/commit/89fd32546c65d49736c657d6d154cf11acdb2233))
+
 ## [1.2.0](https://github.com/alrayyes/hush-hush-action/compare/v1.1.0...v1.2.0) (2026-09-10)
 
 
