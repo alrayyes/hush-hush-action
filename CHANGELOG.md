@@ -1,5 +1,17 @@
 # Changelog
 
+## [1.2.0](https://github.com/alrayyes/hush-hush-action/compare/v1.1.0...v1.2.0) (2026-09-10)
+
+
+### Features
+
+* wire LTeX and Vale prose linting ([#15](https://github.com/alrayyes/hush-hush-action/issues/15)) ([b1fde55](https://github.com/alrayyes/hush-hush-action/commit/b1fde559f84aea313c39ea23f290d7d0d465a356))
+
+
+### Bug Fixes
+
+* **ci:** report_type is underscore-separated, not report-type ([#17](https://github.com/alrayyes/hush-hush-action/issues/17)) ([e4418b4](https://github.com/alrayyes/hush-hush-action/commit/e4418b4ae1dd85cd6b493c0709a6ca0e3f26b639))
+
 ## [1.1.0](https://github.com/alrayyes/hush-hush-action/compare/v1.0.0...v1.1.0) (2026-09-10)
 
 
