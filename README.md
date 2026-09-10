@@ -94,6 +94,9 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 - `tests/coverage.sh` - line coverage for `scripts/lib.sh` via `kcov`,
   uploaded to [Codecov](https://codecov.io/gh/alrayyes/hush-hush-action).
   Runs inside an `ubuntu:22.04` container (kcov isn't packaged for 24.04).
+- CI also uploads `tests/*.bats`'s JUnit output to Codecov Test Analytics,
+  so a red PR shows which test failed and its history, not just a coverage
+  delta.
 
 ## Licence
 
