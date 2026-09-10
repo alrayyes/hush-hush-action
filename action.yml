@@ -1,0 +1,65 @@
+name: "Hush Hush Action"
+description: >-
+  Fetches and decrypts one secret from a self-hosted hush-hush object store
+  (github.com/alrayyes/Hush-Hush) using an age private key, masking the
+  value in the workflow log.
+author: "alrayyes"
+branding:
+  icon: "lock"
+  color: "gray-dark"
+
+inputs:
+  server:
+    description: "Base URL of the hush-hush server, e.g. https://hush-hush.example.internal"
+    required: true
+  identity:
+    description: >-
+      Age private key (identity) that can decrypt the requested object.
+      Treat this the same as the plaintext secret itself - pass it from a
+      repo secret, never a literal value in the workflow file.
+    required: true
+  object-id:
+    description: "The hush-hush object id to fetch."
+    required: true
+  caller:
+    description: >-
+      Self-reported caller label recorded in hush-hush's audit log
+      (X-Caller). Not authenticated - a courtesy label, not an identity
+      check. Defaults to "<repository>/<workflow>" when left empty.
+    required: false
+    default: ""
+  cli-version:
+    description: "Exact hush-hush-cli release tag to install, e.g. v1.4.2."
+    required: true
+
+outputs:
+  value:
+    description: >-
+      The decrypted secret value. Masked in this job's own logs from the
+      moment it's fetched - see the README for the downstream-masking
+      caveat before echoing steps.*.outputs.value in a later step or job.
+    value: ${{ steps.fetch.outputs.value }}
+
+runs:
+  using: "composite"
+  steps:
+    - name: Mask identity
+      shell: bash
+      run: echo "::add-mask::${{ inputs.identity }}"
+
+    - name: Install hush-hush-cli
+      shell: bash
+      env:
+        HHC_VERSION: ${{ inputs.cli-version }}
+      run: "${{ github.action_path }}/scripts/install.sh"
+
+    - name: Fetch secret
+      id: fetch
+      shell: bash
+      env:
+        HUSH_HUSH_SERVER: ${{ inputs.server }}
+        HUSH_HUSH_IDENTITY: ${{ inputs.identity }}
+        OBJECT_ID: ${{ inputs.object-id }}
+        CALLER: ${{ inputs.caller }}
+        DEFAULT_CALLER: "${{ github.repository }}/${{ github.workflow }}"
+      run: "${{ github.action_path }}/scripts/get.sh"
