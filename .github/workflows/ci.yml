@@ -102,7 +102,7 @@ jobs:
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
           files: junit-out.xml
-          report-type: test_results
+          report_type: test_results
 
   # Grammar, spelling, the phonetic article - mechanics have a right answer,
   # so this fails the build. The job's own container is ghcr.io's
