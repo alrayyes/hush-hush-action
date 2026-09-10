@@ -1,9 +1,14 @@
 # Nobody picks a version. release-please reads the Conventional Commits that
 # land on main and keeps a release pull request open carrying the next
 # version and the changelog entry; merging that pull request tags the
-# release and writes the notes. There's no build step here (this repo
-# publishes nothing but its own source at a tag), so the default
-# GITHUB_TOKEN is enough - no separate RELEASE_TOKEN needed.
+# release and writes the notes.
+#
+# RELEASE_TOKEN, not the default GITHUB_TOKEN: a release-please pull request
+# authored by github-actions[bot] sits at action_required with zero jobs run
+# on some github.com/alrayyes repos, this one included - confirmed live, the
+# mechanism itself still isn't fully understood (alrayyes/dotfiles#483). The
+# earlier "no build step, GITHUB_TOKEN is enough" reasoning here didn't hold;
+# this repo hit the same wall as every other one that skipped RELEASE_TOKEN.
 #
 # releases.md says adopt actions/attest-build-provenance unconditionally on
 # every GitHub repo - deliberately skipped here rather than silently
@@ -36,6 +41,6 @@ jobs:
     steps:
       - uses: googleapis/release-please-action@45996ed1f6d02564a971a2fa1b5860e934307cf7 # v5.0.0
         with:
-          token: ${{ secrets.GITHUB_TOKEN }}
+          token: ${{ secrets.RELEASE_TOKEN }}
           config-file: release-please-config.json
           manifest-file: .release-please-manifest.json
