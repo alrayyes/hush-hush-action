@@ -51,7 +51,7 @@ On Forgejo, reference it by full URL instead:
 | `identity`    | yes      | Age private key that can decrypt the object. Pass it from a repo secret, never a literal.                |
 | `object-id`   | yes      | The hush-hush object id to fetch.                                                                        |
 | `caller`      | no       | Self-reported `X-Caller` label recorded in hush-hush's audit log. Defaults to `<repository>/<workflow>`. |
-| `cli-version` | yes      | Exact `hush-hush-cli` release tag to install, e.g. `v1.4.2`.                                             |
+| `cli-version` | yes      | Exact `hush-hush-cli` release tag to install, for example `v1.4.2`.                                      |
 
 ### Outputs
 
@@ -93,7 +93,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
   measure them.
 - `tests/coverage.sh` - line coverage for `scripts/lib.sh` via `kcov`,
   uploaded to [Codecov](https://codecov.io/gh/alrayyes/hush-hush-action).
-  Runs inside an `ubuntu:22.04` container (kcov isn't packaged for 24.04).
+  Runs inside a container based on `ubuntu:22.04` (kcov isn't packaged for
+  24.04).
 - CI also uploads `tests/*.bats`'s JUnit output to Codecov Test Analytics,
   so a red PR shows which test failed and its history, not just a coverage
   delta.

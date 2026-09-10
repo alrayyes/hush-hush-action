@@ -1,0 +1,36 @@
+{
+  "ltex": {
+    "language": "en-GB",
+    "dictionary": {
+      "en-GB": [
+        "hush-hush",
+        "hush-hush-cli",
+        "hush-hush-action",
+        "Forgejo",
+        "kcov",
+        "Codecov",
+        "OpenSpec",
+        "commitlint",
+        "markdownlint",
+        "shellcheck",
+        "actionlint",
+        "lefthook",
+        "keypair",
+        "keypairs",
+        "toolchain",
+        "identity's"
+      ]
+    },
+    "disabledRules": {
+      "en-GB": [
+        "PASSIVE_VOICE",
+        "UPPERCASE_SENTENCE_START",
+        "EN_COMPOUNDS_HAND_WRITTEN",
+        "PREPOSITION_VERB",
+        "A_INFINITIVE",
+        "UH_UH_COMMA",
+        "ID_CASING"
+      ]
+    }
+  }
+}

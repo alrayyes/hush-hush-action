@@ -26,6 +26,12 @@ pre-commit:
       glob: "*.md"
       run: bunx markdownlint-cli2 {staged_files}
 
+    # Fast enough for pre-commit per markdown.md; LTeX (slower - it fetches
+    # or runs a ~300MB JDK-bundling image) is a pre-push job instead.
+    - name: vale
+      glob: "*.md"
+      run: ./scripts/lint-vale.sh
+
 commit-msg:
   jobs:
     - name: commitlint
@@ -56,3 +62,6 @@ pre-push:
 
     - name: markdownlint
       run: bun run lint:md
+
+    - name: ltex
+      run: ./scripts/lint-ltex.sh

@@ -11,3 +11,7 @@ ignores:
   # by the tool's own template convention, not a top-level `#` heading -
   # content nobody reads as prose, not this repo's own documentation.
   - "openspec/**"
+  # Vale's style packages, downloaded by `vale sync` - somebody else's
+  # docs, held to somebody else's rules.
+  - "styles/Google/**"
+  - "styles/proselint/**"
