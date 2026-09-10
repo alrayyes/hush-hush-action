@@ -1,0 +1,51 @@
+# The same commands CI runs, so the two cannot drift. The hook catches it
+# early; CI is the gate that cannot be skipped.
+
+pre-commit:
+  jobs:
+    - name: shellcheck
+      glob: "*.sh"
+      run: shellcheck -x {staged_files}
+
+    # Bare, no file args: actionlint auto-discovers action.yml and
+    # .github/workflows/*.yml and parses each with the right schema. Passing
+    # action.yml explicitly forces workflow-schema parsing on a file that
+    # isn't a workflow, which fails on every composite-action-only key.
+    - name: actionlint
+      glob:
+        - "action.yml"
+        - ".github/workflows/*.{yml,yaml}"
+      run: actionlint
+
+    - name: prettier
+      glob: "*.{md,yml,yaml}"
+      run: bunx prettier --write {staged_files}
+      stage_fixed: true
+
+    - name: markdownlint
+      glob: "*.md"
+      run: bunx markdownlint-cli2 {staged_files}
+
+commit-msg:
+  jobs:
+    - name: commitlint
+      run: bunx commitlint --edit {1}
+
+# pre-push never writes - every job below runs in check mode.
+pre-push:
+  parallel: true
+  jobs:
+    - name: shellcheck
+      run: shellcheck -x scripts/*.sh tests/integration/*.sh
+
+    - name: actionlint
+      run: actionlint
+
+    - name: bats
+      run: bats tests/*.bats
+
+    - name: prettier
+      run: bun run format:check
+
+    - name: markdownlint
+      run: bun run lint:md

@@ -1,0 +1,34 @@
+# Nothing here is JavaScript. package.json exists so commitlint can resolve
+# the shared config it extends, which bunx alone cannot do.
+version: 2
+
+updates:
+  - package-ecosystem: github-actions
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Amsterdam
+    commit-message:
+      prefix: ci
+      include: scope
+    groups:
+      actions:
+        patterns: ["*"]
+        update-types: [minor, patch]
+
+  - package-ecosystem: bun
+    directory: /
+    schedule:
+      interval: weekly
+      day: monday
+      time: "06:00"
+      timezone: Europe/Amsterdam
+    commit-message:
+      prefix: chore
+      include: scope
+    groups:
+      tooling:
+        patterns: ["*"]
+        update-types: [minor, patch]
