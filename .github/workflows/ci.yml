@@ -41,7 +41,7 @@ jobs:
       - name: shellcheck
         run: |
           shopt -s nullglob
-          files=(scripts/*.sh tests/integration/*.sh)
+          files=(scripts/*.sh tests/integration/*.sh tests/coverage.sh)
           if [ "${#files[@]}" -gt 0 ]; then
             shellcheck -x "${files[@]}"
           fi
@@ -56,16 +56,38 @@ jobs:
       - name: bun audit
         run: bun audit
 
+  # ubuntu-22.04, not ubuntu-latest: kcov isn't packaged for 24.04 at all
+  # (confirmed live - "Unable to locate package" even with universe
+  # enabled), and 22.04 still carries kcov 38.
   test:
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
+    runs-on: ubuntu-22.04
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      # Not `apt-get install bats`: Ubuntu's packaged version is 1.2.1.
+      # Pinned to an exact bats-core release instead, same as any other
+      # dependency.
+      - name: Install bats-core
+        run: |
+          git clone --quiet --depth 1 --branch v1.14.0 https://github.com/bats-core/bats-core.git /tmp/bats-core
+          sudo /tmp/bats-core/install.sh /usr/local
       - name: bats
+        run: bats tests/*.bats
+      - name: Install kcov
         run: |
           sudo apt-get update
-          sudo apt-get install -y --no-install-recommends bats
-          bats tests/*.bats
+          sudo apt-get install -y --no-install-recommends kcov
+      # scripts/install.sh and scripts/get.sh aren't measured here - see
+      # tests/coverage.sh's own comment for why (the real-container
+      # integration test exercises them instead).
+      - name: Coverage
+        run: kcov --include-path=scripts coverage-out bats tests/lib.bats
+      - name: Upload coverage
+        uses: codecov/codecov-action@fb8b3582c8e4def4969c97caa2f19720cb33a72f # v7.0.0
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: coverage-out/*/cobertura.xml
+          fail_ci_if_error: true
 
   # Real containers, no mocking: a real hush-hush server, a real Forgejo
   # instance, and a real Forgejo Actions runner, exercising this action the
