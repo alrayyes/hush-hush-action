@@ -4,6 +4,15 @@
 # release and writes the notes. There's no build step here (this repo
 # publishes nothing but its own source at a tag), so the default
 # GITHUB_TOKEN is enough - no separate RELEASE_TOKEN needed.
+#
+# releases.md says adopt actions/attest-build-provenance unconditionally on
+# every GitHub repo - deliberately skipped here rather than silently
+# omitted: provenance ties a *built* artifact to the workflow run that
+# produced it, and there's no build step, so nothing gets transformed from
+# source into something worth attesting. What a consumer pins
+# (`uses: alrayyes/hush-hush-action@vX`) is the tagged source tree itself,
+# which git's own tag already identifies. Revisit if this repo ever grows a
+# build step.
 name: release
 
 on:
