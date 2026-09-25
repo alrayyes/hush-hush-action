@@ -25,20 +25,26 @@ updates:
         patterns: ["*"]
         update-types: [major]
 
-  - package-ecosystem: bun
-    directory: /
-    schedule:
-      interval: weekly
-      day: monday
-      time: "06:00"
-      timezone: Europe/Amsterdam
-    commit-message:
-      prefix: chore
-      include: scope
-    groups:
-      tooling:
-        patterns: ["*"]
-        update-types: [minor, patch]
-      tooling-major:
-        patterns: ["*"]
-        update-types: [major]
+  # Paused: Dependabot's bundled bun binary can't parse this repo's
+  # bun.lock (lockfileVersion 2, what bun 1.4+ writes by default) --
+  # every weekly run fails before it even looks at what needs updating.
+  # Upstream bug, not ours: dependabot/dependabot-core#16026, fix open
+  # as dependabot/dependabot-core#16071 but not merged. Re-enable once
+  # that lands.
+  # - package-ecosystem: bun
+  #   directory: /
+  #   schedule:
+  #     interval: weekly
+  #     day: monday
+  #     time: "06:00"
+  #     timezone: Europe/Amsterdam
+  #   commit-message:
+  #     prefix: chore
+  #     include: scope
+  #   groups:
+  #     tooling:
+  #       patterns: ["*"]
+  #       update-types: [minor, patch]
+  #     tooling-major:
+  #       patterns: ["*"]
+  #       update-types: [major]
