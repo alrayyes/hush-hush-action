@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.2.3](https://github.com/alrayyes/hush-hush-action/compare/v1.2.2...v1.2.3) (2026-09-25)
+
+
+### Bug Fixes
+
+* **deps:** pause bun ecosystem in dependabot.yml, upstream can't parse it ([8f5b8e3](https://github.com/alrayyes/hush-hush-action/commit/8f5b8e3aa500e378d72a9bd189cfd07052b2b1e2))
+* **deps:** pause bun ecosystem in dependabot.yml, upstream can't parse it ([945ac4d](https://github.com/alrayyes/hush-hush-action/commit/945ac4d0ab06fef39ef33a5b6e93366ddaaac764)), closes [#28](https://github.com/alrayyes/hush-hush-action/issues/28)
+
 ## [1.2.2](https://github.com/alrayyes/hush-hush-action/compare/v1.2.1...v1.2.2) (2026-09-10)
 
 
