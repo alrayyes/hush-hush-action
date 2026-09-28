@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.3.0](https://github.com/alrayyes/hush-hush-action/compare/v1.2.3...v1.3.0) (2026-09-28)
+
+
+### Features
+
+* support a consumer-token input for GET /objects/{slug} ([38517e7](https://github.com/alrayyes/hush-hush-action/commit/38517e77a51cf9f9eb29843f08d391e9ae629d5c))
+* support a consumer-token input for GET /objects/{slug} ([215f1fe](https://github.com/alrayyes/hush-hush-action/commit/215f1fe091e5d7e355148f5d4ff30592f982e509))
+
 ## [1.2.3](https://github.com/alrayyes/hush-hush-action/compare/v1.2.2...v1.2.3) (2026-09-25)
 
 
