@@ -19,6 +19,7 @@ fi
 value="$(hush-hush-cli get "$OBJECT_ID" \
   --server "$HUSH_HUSH_SERVER" \
   --identity "$HUSH_HUSH_IDENTITY" \
+  --consumer-token "${CONSUMER_TOKEN:-}" \
   --caller "$caller")"
 
 echo "::add-mask::$value"

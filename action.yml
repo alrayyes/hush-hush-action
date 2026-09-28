@@ -28,6 +28,16 @@ inputs:
       check. Defaults to "<repository>/<workflow>" when left empty.
     required: false
     default: ""
+  consumer-token:
+    description: >-
+      Read-only, consumer-scoped bearer token hush-hush requires to fetch
+      the object - the server's confidentiality boundary is still the age
+      identity above, this is a further access-control check on top of
+      it. Treat this the same as the identity - pass it from a repo
+      secret, never a literal value in the workflow file. Requires
+      hush-hush-cli v1.10.2 or newer (cli-version).
+    required: false
+    default: ""
   cli-version:
     description: "Exact hush-hush-cli release tag to install, e.g. v1.4.2."
     required: true
@@ -47,6 +57,11 @@ runs:
       shell: bash
       run: echo "::add-mask::${{ inputs.identity }}"
 
+    - name: Mask consumer token
+      if: inputs.consumer-token != ''
+      shell: bash
+      run: echo "::add-mask::${{ inputs.consumer-token }}"
+
     - name: Install hush-hush-cli
       shell: bash
       env:
@@ -61,5 +76,6 @@ runs:
         HUSH_HUSH_IDENTITY: ${{ inputs.identity }}
         OBJECT_ID: ${{ inputs.object-id }}
         CALLER: ${{ inputs.caller }}
+        CONSUMER_TOKEN: ${{ inputs.consumer-token }}
         DEFAULT_CALLER: "${{ github.repository }}/${{ github.workflow }}"
       run: "${{ github.action_path }}/scripts/get.sh"
