@@ -13,10 +13,13 @@ work="$(mktemp -d)"
 net="hh-it-$$"
 
 # Pinned by digest, same images/tags this repo documents elsewhere.
-HUSH_HUSH_IMAGE="ghcr.io/alrayyes/hush-hush@sha256:e1c3df1657c0101c91cd6ffc952702ad9e8eb1060a794f56af699c3245e06ce7" # 2.0.1
+# hush-hush 2.40.1 is the first version this test needs: GET /objects/{slug}
+# now requires a credential (alrayyes/hush-hush#438/#446), which is exactly
+# what this test exercises.
+HUSH_HUSH_IMAGE="ghcr.io/alrayyes/hush-hush@sha256:72fe50a390b1ade923683af45ec7685807628301d8ebd84641ecff67289a219c" # 2.40.1
 FORGEJO_IMAGE="code.forgejo.org/forgejo/forgejo@sha256:3c34f11fe8b9983096eef3f8f25c2d2c21c4ae7504960cb203f0b075d1d8ed73" # 9.0.3
 RUNNER_IMAGE="code.forgejo.org/forgejo/runner@sha256:fb38cf65183f935821b930de7bd27c303aa188d297be709c762dae564f838402" # 9.1.1
-HHC_VERSION="v1.4.2"
+HHC_VERSION="v1.10.2" # first version with --consumer-token support
 TEST_SECRET_VALUE="runner-e2e-secret-value"
 
 cleanup() {
@@ -118,6 +121,7 @@ jobs:
           server: http://hh-it-hush-$$:8080
           identity: \${{ secrets.HH_IDENTITY }}
           object-id: test_object
+          consumer-token: \${{ secrets.HH_CONSUMER_TOKEN }}
           cli-version: $HHC_VERSION
       - run: |
           if [ "\$VALUE" != "$TEST_SECRET_VALUE" ]; then
@@ -127,6 +131,25 @@ jobs:
           echo "value matched expected plaintext"
         env:
           VALUE: \${{ steps.hh.outputs.value }}
+
+  fetch-without-token:
+    runs-on: docker
+    steps:
+      - uses: actions/checkout@v4
+      - id: hh
+        continue-on-error: true
+        uses: ./
+        with:
+          server: http://hh-it-hush-$$:8080
+          identity: \${{ secrets.HH_IDENTITY }}
+          object-id: test_object
+          cli-version: $HHC_VERSION
+      - run: |
+          if [ "\${{ steps.hh.outcome }}" != "failure" ]; then
+            echo "expected the fetch step to fail without a consumer-token, but it \${{ steps.hh.outcome }}"
+            exit 1
+          fi
+          echo "fetch correctly failed without a credential"
 EOF
 
 git -C "$fixture" init -q -b main
@@ -136,6 +159,17 @@ git -C "$fixture" -c user.email=test@example.com -c user.name=test commit -q -m 
 curl -sf -X PUT "http://localhost:$forgejo_port/api/v1/repos/testadmin/fixture/actions/secrets/HH_IDENTITY" \
   -H "Authorization: token $forgejo_token" -H "Content-Type: application/json" \
   -d "$(jq -n --arg v "$consumer_priv" '{data:$v}')" >/dev/null
+
+# hush-hush's write token already authorizes any read (design.md's "a
+# write bearer token... reads any object, unrestricted") - reusing it here
+# as the consumer-token input proves the action correctly passes whatever
+# credential it's given through to the CLI and the server accepts it,
+# without this test needing its own WebAuthn ceremony just to mint a
+# genuine consumer-scoped token (that scoping behavior is hush-hush's own
+# test suite's job, not this action's).
+curl -sf -X PUT "http://localhost:$forgejo_port/api/v1/repos/testadmin/fixture/actions/secrets/HH_CONSUMER_TOKEN" \
+  -H "Authorization: token $forgejo_token" -H "Content-Type: application/json" \
+  -d "$(jq -n --arg v "$hh_write_token" '{data:$v}')" >/dev/null
 
 echo "==> forgejo: register a runner pinned to this test's network"
 runner_config="$work/runner-config.yaml"

@@ -12,14 +12,20 @@ before either can reach a log.
 ## Requirements
 
 - A running [hush-hush](https://github.com/alrayyes/Hush-Hush) server,
-  reachable from the runner.
+  reachable from the runner. Fetching an object requires a credential - a
+  consumer read token, scoped to whichever consumer it's bound to (see
+  below).
 - An age keypair whose private key can decrypt the object you're fetching
   (`age-keygen`) - store the private key as a repo (or org) secret, never a
   literal in the workflow file.
+- A consumer read token for the object you're fetching, issued from
+  hush-hush's own settings page - store it as a repo (or org) secret the
+  same way as the identity.
 - The runner is Linux or macOS, amd64 or arm64 - `hush-hush-cli` ships no
   Windows release this action installs.
 - The exact `hush-hush-cli` release tag you want installed (`cli-version`) -
-  see [its releases](https://github.com/alrayyes/hush-hush-cli/releases).
+  v1.10.2 or newer, for `consumer-token` support. See
+  [its releases](https://github.com/alrayyes/hush-hush-cli/releases).
 
 ## Usage
 
@@ -30,7 +36,8 @@ before either can reach a log.
     server: https://hush-hush.example.internal
     identity: ${{ secrets.HUSH_HUSH_IDENTITY }}
     object-id: prod_deploy_webhook
-    cli-version: v1.4.2
+    consumer-token: ${{ secrets.HUSH_HUSH_CONSUMER_TOKEN }}
+    cli-version: v1.10.2
 
 - run: curl -X POST "$WEBHOOK"
   env:
@@ -45,13 +52,14 @@ On Forgejo, reference it by full URL instead:
 
 ### Inputs
 
-| Input         | Required | Description                                                                                              |
-| ------------- | -------- | -------------------------------------------------------------------------------------------------------- |
-| `server`      | yes      | Base URL of the hush-hush server.                                                                        |
-| `identity`    | yes      | Age private key that can decrypt the object. Pass it from a repo secret, never a literal.                |
-| `object-id`   | yes      | The hush-hush object id to fetch.                                                                        |
-| `caller`      | no       | Self-reported `X-Caller` label recorded in hush-hush's audit log. Defaults to `<repository>/<workflow>`. |
-| `cli-version` | yes      | Exact `hush-hush-cli` release tag to install, for example `v1.4.2`.                                      |
+| Input            | Required | Description                                                                                                    |
+| ---------------- | -------- | -------------------------------------------------------------------------------------------------------------- |
+| `server`         | yes      | Base URL of the hush-hush server.                                                                              |
+| `identity`       | yes      | Age private key that can decrypt the object. Pass it from a repo secret, never a literal.                      |
+| `object-id`      | yes      | The hush-hush object id to fetch.                                                                              |
+| `caller`         | no       | Self-reported `X-Caller` label recorded in hush-hush's audit log. Defaults to `<repository>/<workflow>`.       |
+| `consumer-token` | no       | Read-only, consumer-scoped bearer token. hush-hush rejects the fetch without one - pass it from a repo secret. |
+| `cli-version`    | yes      | Exact `hush-hush-cli` release tag to install, for example `v1.10.2`.                                           |
 
 ### Outputs
 
@@ -61,11 +69,11 @@ On Forgejo, reference it by full URL instead:
 
 ## How the masking works, and its limit
 
-Both the `identity` input and the fetched plaintext are registered with
-`::add-mask::` the moment they're available, before either can appear in a
-log line - Forgejo and GitHub only auto-mask their own `secrets.*` context,
-not a value fetched from outside it at runtime, so this action does that
-registration itself.
+The `identity` input, a non-empty `consumer-token` input, and the fetched
+plaintext are all registered with `::add-mask::` the moment they're
+available, before any can appear in a log line - Forgejo and GitHub only
+auto-mask their own `secrets.*` context, not a value fetched from outside
+it at runtime, so this action does that registration itself.
 
 **That masking is scoped to values already seen when a log line is
 written.** If a later step or job echoes `steps.hh.outputs.value` (or
