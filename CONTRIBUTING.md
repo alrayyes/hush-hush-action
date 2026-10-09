@@ -14,8 +14,19 @@ no roadmap beyond what the maintainer needs.
   tests under `tests/`.
 - [shellcheck](https://www.shellcheck.net/) and
   [actionlint](https://github.com/rhysd/actionlint) lint the scripts and the
-  action/workflow YAML respectively — both run in CI and in the pre-commit
-  hook.
+  action/workflow YAML respectively. Both run in CI and in the pre-push
+  hook; shellcheck also runs in pre-commit, over the staged scripts only.
+
+## Git hooks
+
+`pre-commit` judges only what the commit contains: each job takes the staged
+files, makes no network fetch and reads no other file in the tree. Fixers
+(prettier) write only to staged files and restage them.
+
+`pre-push` runs the whole-tree checks, in check mode: shellcheck, actionlint
+(it can't take a file list), bats, prettier, markdownlint, Vale, and the grammar check. CI
+runs the same checks. On a fresh clone, run `scripts/lint-vale.sh` once with
+no arguments to fetch the Vale styles.
 
 ## Commits
 
