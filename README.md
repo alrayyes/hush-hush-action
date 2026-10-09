@@ -106,6 +106,15 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
   so a red PR shows which test failed and its history, not just a coverage
   delta.
 
+## Reports
+
+CI publishes its results on every push to `main`:
+
+- [Reports index](https://apis.ryankes.eu/hush-hush-action/reports/)
+- [Unit test results](https://apis.ryankes.eu/hush-hush-action/reports/tests/unit.xml) (JUnit XML)
+- [Coverage](https://apis.ryankes.eu/hush-hush-action/reports/coverage/) (kcov HTML)
+- [Coverage](https://apis.ryankes.eu/hush-hush-action/reports/coverage/coverage.xml) (Cobertura XML)
+
 ## Licence
 
 [GPL-3.0](LICENSE), same as
