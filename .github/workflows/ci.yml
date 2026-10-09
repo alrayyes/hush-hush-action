@@ -53,8 +53,11 @@ jobs:
       # tooling devDependencies live in package.json, but a CVE in one of
       # them (a supply-chain compromise in a lint tool, say) is still worth
       # catching before it's `bunx`'d in CI or a hook.
+      # Ignored: braces 3.0.3 (GHSA-vfj7-8cjw-p6xm) has no patched release and
+      # upstream is unmaintained. Dev-only, reached through markdownlint-cli2
+      # globbing our own paths. Drop the ignore once a fix ships.
       - name: bun audit
-        run: bun audit
+        run: bun audit --ignore=GHSA-vfj7-8cjw-p6xm
 
   # ubuntu-22.04, not ubuntu-latest: kcov isn't packaged for 24.04 at all
   # (confirmed live - "Unable to locate package" even with universe
