@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.0](https://github.com/alrayyes/hush-hush-action/compare/v1.3.0...v1.4.0) (2026-10-09)
+
+
+### Features
+
+* **ci:** publish test and coverage reports to GitHub Pages ([9379b88](https://github.com/alrayyes/hush-hush-action/commit/9379b886405222866717b8636ed093a63c24835a))
+* **ci:** publish test and coverage reports to GitHub Pages ([d0543e3](https://github.com/alrayyes/hush-hush-action/commit/d0543e3a8eb4743a5d0d5f7cceee777186ec4ed1))
+
 ## [1.3.0](https://github.com/alrayyes/hush-hush-action/compare/v1.2.3...v1.3.0) (2026-09-28)
 
 
