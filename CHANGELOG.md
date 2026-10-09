@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.4.1](https://github.com/alrayyes/hush-hush-action/compare/v1.4.0...v1.4.1) (2026-10-09)
+
+
+### Bug Fixes
+
+* **deps:** clear bun audit advisories ([d57164c](https://github.com/alrayyes/hush-hush-action/commit/d57164c11e01fe02b384202217321979b35ff6ac))
+* **deps:** pin patched versions of audited transitive packages ([65038f2](https://github.com/alrayyes/hush-hush-action/commit/65038f208b1eae63a675a0679cebb9373e0d6ab4)), closes [#37](https://github.com/alrayyes/hush-hush-action/issues/37)
+
 ## [1.4.0](https://github.com/alrayyes/hush-hush-action/compare/v1.3.0...v1.4.0) (2026-10-09)
 
 
