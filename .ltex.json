@@ -8,6 +8,7 @@
         "hush-hush-action",
         "Forgejo",
         "kcov",
+        "Cobertura",
         "Codecov",
         "OpenSpec",
         "commitlint",

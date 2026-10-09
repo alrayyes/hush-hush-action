@@ -7,3 +7,5 @@ junit-out.xml
 # wholesale, or this ignores styles/config/ (ours) along with them.
 styles/Google/
 styles/proselint/
+staged/
+site/
