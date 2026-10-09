@@ -10,9 +10,15 @@
     "lefthook": "2.1.10",
     "prettier": "3.9.6"
   },
-  "trustedDependencies": ["lefthook"],
+  "trustedDependencies": [
+    "lefthook"
+  ],
   "overrides": {
-    "smol-toml": "1.8.0"
+    "fast-uri": "3.1.8",
+    "js-yaml": "5.4.3",
+    "katex": "0.18.11",
+    "markdown-it": "14.3.2",
+    "smol-toml": "1.9.1"
   },
   "scripts": {
     "prepare": "lefthook install",
