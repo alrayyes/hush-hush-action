@@ -53,6 +53,10 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Check requirements
+      shell: sh
+      run: "${{ github.action_path }}/scripts/check-requirements.sh"
+
     - name: Mask identity
       shell: bash
       run: echo "::add-mask::${{ inputs.identity }}"
