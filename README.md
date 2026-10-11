@@ -15,9 +15,15 @@ before either can reach a log.
   reachable from the runner. Fetching an object requires a credential - a
   consumer read token, scoped to whichever consumer it's bound to (see
   below).
+- `bash` and `curl` on the runner image, installed before this action runs.
+  Minimal images such as Alpine ship neither, so install them first, for
+  example `apk add --no-cache bash curl`. The action's first step checks and
+  fails with that hint instead of a bare exit 127.
 - An age keypair whose private key can decrypt the object you're fetching
   (`age-keygen`) - store the private key as a repo (or org) secret, never a
-  literal in the workflow file.
+  literal in the workflow file. The `identity` input is only the
+  `AGE-SECRET-KEY-...` line, not the whole `age-keygen` output: the comment
+  lines around it make the key fail to parse and leak into the log.
 - A consumer read token for the object you're fetching, issued from
   hush-hush's own settings page - store it as a repo (or org) secret the
   same way as the identity.
