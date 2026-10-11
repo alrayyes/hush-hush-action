@@ -1,5 +1,13 @@
 # Changelog
 
+## [1.5.0](https://github.com/alrayyes/hush-hush-action/compare/v1.4.1...v1.5.0) (2026-10-11)
+
+
+### Features
+
+* fail clearly when bash or curl is missing ([c8679a9](https://github.com/alrayyes/hush-hush-action/commit/c8679a9100283649ced3bf8fdbc6271fe5437cfc))
+* fail clearly when bash or curl is missing ([6372633](https://github.com/alrayyes/hush-hush-action/commit/63726339d3964265239259d89f38d7427fad08a5)), closes [#43](https://github.com/alrayyes/hush-hush-action/issues/43)
+
 ## [1.4.1](https://github.com/alrayyes/hush-hush-action/compare/v1.4.0...v1.4.1) (2026-10-09)
 
 
