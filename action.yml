@@ -53,6 +53,10 @@ outputs:
 runs:
   using: "composite"
   steps:
+    - name: Check bash and curl
+      shell: sh
+      run: "${{ github.action_path }}/scripts/preflight.sh"
+
     - name: Mask identity
       shell: bash
       run: echo "::add-mask::${{ inputs.identity }}"
