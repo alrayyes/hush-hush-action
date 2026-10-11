@@ -18,6 +18,9 @@ before either can reach a log.
 - An age keypair whose private key can decrypt the object you're fetching
   (`age-keygen`) - store the private key as a repo (or org) secret, never a
   literal in the workflow file.
+  Give `identity` only the `AGE-SECRET-KEY-...` line. Pasting the whole
+  `age-keygen` output fails with `malformed secret key: mixed case`, and the
+  error prints the key in the log.
 - A consumer read token for the object you're fetching, issued from
   hush-hush's own settings page - store it as a repo (or org) secret the
   same way as the identity.
@@ -26,6 +29,9 @@ before either can reach a log.
 - The exact `hush-hush-cli` release tag you want installed (`cli-version`) -
   v1.10.2 or newer, for `consumer-token` support. See
   [its releases](https://github.com/alrayyes/hush-hush-cli/releases).
+- `bash` and `curl` on the job image, installed before this action runs. A
+  minimal image such as Alpine has neither, and the action's first step then
+  fails saying so (for example `apk add --no-cache bash curl`).
 
 ## Usage
 
