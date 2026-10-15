@@ -49,15 +49,51 @@ jobs:
         uses: docker://rhysd/actionlint@sha256:887a259a5a534f3c4f36cb02dca341673c6089431057242cdc931e9f133147e9 # 1.7.7
         with:
           args: -color
-      # dependencies.md: no excuse for a bun-based repo to skip this. Only
-      # tooling devDependencies live in package.json, but a CVE in one of
-      # them (a supply-chain compromise in a lint tool, say) is still worth
-      # catching before it's `bunx`'d in CI or a hook.
-      # Ignored: braces 3.0.3 (GHSA-vfj7-8cjw-p6xm) has no patched release and
-      # upstream is unmaintained. Dev-only, reached through markdownlint-cli2
-      # globbing our own paths. Drop the ignore once a fix ships.
-      - name: bun audit
-        run: bun audit --ignore=GHSA-vfj7-8cjw-p6xm
+
+  # Works out whether a pull request touched what the audit reads. A skipped job reports
+  # success, so branch protection can still require the audit; a `paths:` filter on the
+  # workflow would leave it pending forever. A push to main always audits.
+  changes:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    outputs:
+      deps: ${{ steps.groups.outputs.deps }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
+      - id: groups
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE: ${{ github.event.pull_request.base.sha }}
+        run: |
+          deps=true
+          if [ "${EVENT}" = pull_request ] &&
+            ! git diff --name-only "${BASE}...HEAD" |
+              grep -Eq '^(package\.json|bun\.lock|\.github/workflows/ci\.yml)$'; then
+            deps=false
+          fi
+          echo "deps=${deps}" >> "$GITHUB_OUTPUT"
+
+  # Fails only on advisories this change adds to bun.lock over its base (rules/dependencies.md).
+  # What is already on main is the scan's to track, in advisory-scan.yml. A CVE in a lint tool
+  # is still worth catching before it's `bunx`'d in CI or a hook. bun audit reads the lockfile,
+  # so neither side needs an install.
+  audit:
+    needs: changes
+    if: needs.changes.outputs.deps == 'true'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: oven-sh/setup-bun@0c5077e51419868618aeaa5fe8019c62421857d6 # v2.2.0
+        with:
+          bun-version: "1.4.0"
+      # Pinned to a main commit of alrayyes/advisory-scan until its first release; re-pin then.
+      - uses: alrayyes/advisory-scan@425418a63e80eb10142fbd2e82127b7ef3a51d68
+        with:
+          mode: gate
+          command: bun audit
 
   # ubuntu-22.04, not ubuntu-latest: kcov isn't packaged for 24.04 at all
   # (confirmed live - "Unable to locate package" even with universe
@@ -223,7 +259,7 @@ jobs:
   # commitlint only runs on pull requests, so it isn't a need here.
   deploy:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [reports, lint, mechanics, style, integration]
+    needs: [reports, lint, audit, mechanics, style, integration]
     runs-on: ubuntu-latest
     timeout-minutes: 10
     permissions:
