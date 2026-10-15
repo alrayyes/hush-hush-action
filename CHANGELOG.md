@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.1](https://github.com/alrayyes/hush-hush-action/compare/v1.5.0...v1.5.1) (2026-10-15)
+
+
+### Bug Fixes
+
+* **ci:** run release-auto-merge when the autorelease label is added ([#49](https://github.com/alrayyes/hush-hush-action/issues/49)) ([0ccf671](https://github.com/alrayyes/hush-hush-action/commit/0ccf671de69692634ddad053412478d91e4eedfc)), closes [#48](https://github.com/alrayyes/hush-hush-action/issues/48)
+
 ## [1.5.0](https://github.com/alrayyes/hush-hush-action/compare/v1.4.1...v1.5.0) (2026-10-11)
 
 
