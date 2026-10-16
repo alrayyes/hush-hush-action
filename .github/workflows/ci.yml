@@ -52,7 +52,8 @@ jobs:
 
   # Works out whether a pull request touched what the audit reads. A skipped job reports
   # success, so branch protection can still require the audit; a `paths:` filter on the
-  # workflow would leave it pending forever. A push to main always audits.
+  # workflow would leave it pending forever. A push to main always audits. If this job errors
+  # (say the base SHA is missing) the audit runs anyway: failing open would hide an advisory.
   changes:
     runs-on: ubuntu-latest
     timeout-minutes: 5
@@ -68,10 +69,11 @@ jobs:
           BASE: ${{ github.event.pull_request.base.sha }}
         run: |
           deps=true
-          if [ "${EVENT}" = pull_request ] &&
-            ! git diff --name-only "${BASE}...HEAD" |
-              grep -Eq '^(package\.json|bun\.lock|\.github/workflows/ci\.yml)$'; then
-            deps=false
+          if [ "${EVENT}" = pull_request ]; then
+            # Captured first so a failing git diff stops the step (bash -e) instead of
+            # reading as "nothing changed".
+            files=$(git diff --name-only "${BASE}...HEAD")
+            printf '%s\n' "${files}" | grep -Eq '^(package\.json|bun\.lock|\.github/workflows/ci\.yml)$' || deps=false
           fi
           echo "deps=${deps}" >> "$GITHUB_OUTPUT"
 
@@ -81,7 +83,7 @@ jobs:
   # so neither side needs an install.
   audit:
     needs: changes
-    if: needs.changes.outputs.deps == 'true'
+    if: ${{ !cancelled() && (needs.changes.result == 'failure' || needs.changes.outputs.deps == 'true') }}
     runs-on: ubuntu-latest
     timeout-minutes: 10
     steps:
