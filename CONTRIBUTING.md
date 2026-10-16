@@ -38,6 +38,11 @@ commitlint on every commit message. One logical change per commit.
 Every change lands through a pull request against `main`. CI has to be green
 before it merges.
 
+The `audit` job fails a pull request only for advisories it adds to `bun.lock`.
+What is already on `main` is tracked by `advisory-scan.yml`, which keeps one
+open `Dependency advisories` issue and closes it when the audit is clean.
+Nothing is ignored.
+
 ## Releasing
 
 [release-please](https://github.com/googleapis/release-please) opens a
