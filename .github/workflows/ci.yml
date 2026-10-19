@@ -154,7 +154,11 @@ jobs:
           path: staged
           retention-days: 7
           if-no-files-found: error
+      # Dependabot runs can't read the Actions CODECOV_TOKEN, and Codecov
+      # rejects a tokenless upload on a protected branch. A dependency bump
+      # tells coverage nothing, so both uploads skip rather than fail.
       - name: Upload coverage
+        if: ${{ github.actor != 'dependabot[bot]' }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
@@ -166,7 +170,7 @@ jobs:
       # exists either way; that's the case Test Analytics is actually for),
       # but not if the whole run was cancelled out from under it.
       - name: Upload test results
-        if: ${{ !cancelled() }}
+        if: ${{ !cancelled() && github.actor != 'dependabot[bot]' }}
         uses: codecov/codecov-action@303a32d7a59b442fa8d48b6a1cc6825c09c847a5 # v7.1.1
         with:
           token: ${{ secrets.CODECOV_TOKEN }}
