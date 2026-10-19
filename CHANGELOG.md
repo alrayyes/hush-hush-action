@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.5.2](https://github.com/alrayyes/hush-hush-action/compare/v1.5.1...v1.5.2) (2026-10-19)
+
+
+### Bug Fixes
+
+* **ci:** skip codecov uploads on dependabot pull requests ([#59](https://github.com/alrayyes/hush-hush-action/issues/59)) ([09b3ee8](https://github.com/alrayyes/hush-hush-action/commit/09b3ee8f8deb57a28dc1bb897702ae14ec93457a)), closes [#57](https://github.com/alrayyes/hush-hush-action/issues/57)
+
 ## [1.5.1](https://github.com/alrayyes/hush-hush-action/compare/v1.5.0...v1.5.1) (2026-10-15)
 
 
