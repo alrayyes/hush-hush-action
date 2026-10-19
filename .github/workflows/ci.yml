@@ -13,8 +13,11 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Dependabot's single-dependency commits are sentence-case ("Bump x"),
+  # which fails subject-case. A squash merge lands the PR title instead and
+  # pr-title-lint checks that, so skipping the raw commit loses nothing.
   commitlint:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && github.actor != 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
