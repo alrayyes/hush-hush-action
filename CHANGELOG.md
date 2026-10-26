@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.0](https://github.com/alrayyes/hush-hush-action/compare/v1.5.2...v1.6.0) (2026-10-26)
+
+
+### Features
+
+* retry the fetch on a timeout or connection error ([#62](https://github.com/alrayyes/hush-hush-action/issues/62)) ([370476f](https://github.com/alrayyes/hush-hush-action/commit/370476f8364cc8c865d9c44c15a8b0fd9f31ae38))
+
 ## [1.5.2](https://github.com/alrayyes/hush-hush-action/compare/v1.5.1...v1.5.2) (2026-10-19)
 
 
