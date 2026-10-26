@@ -36,6 +36,7 @@ while true; do
     --identity "$HUSH_HUSH_IDENTITY" \
     --consumer-token "${CONSUMER_TOKEN:-}" \
     --caller "$caller" 2>"$err_file")"; then
+    cat "$err_file" >&2
     break
   fi
   cat "$err_file" >&2

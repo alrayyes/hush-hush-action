@@ -68,3 +68,31 @@ STUB
   [ "$status" -ne 0 ]
   [[ "$output" == *"fetch-attempts must be a positive integer"* ]]
 }
+
+@test "a 403 fails on the first attempt" {
+  stub_cli 'get: forbidden' 9
+  run "$script"
+  [ "$status" -ne 0 ]
+  [ "$(cat "$COUNT_FILE")" -eq 1 ]
+}
+
+@test "defaults to three attempts when fetch-attempts is unset" {
+  stub_cli 'call hush-hush server: connection refused' 9
+  run "$script"
+  [ "$status" -ne 0 ]
+  [ "$(cat "$COUNT_FILE")" -eq 3 ]
+}
+
+@test "logs the failed attempt before retrying" {
+  stub_cli 'call hush-hush server: context deadline exceeded' 1
+  run "$script"
+  [[ "$output" == *"context deadline exceeded"* ]]
+  [[ "$output" == *"fetch attempt 1 of 3 failed, retrying"* ]]
+}
+
+@test "rejects a fetch-attempts of zero" {
+  stub_cli x 0
+  FETCH_ATTEMPTS=0 run "$script"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"fetch-attempts must be a positive integer"* ]]
+}
