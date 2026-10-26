@@ -38,6 +38,13 @@ inputs:
       hush-hush-cli v1.10.2 or newer (cli-version).
     required: false
     default: ""
+  fetch-attempts:
+    description: >-
+      How many times to try the fetch when the server times out or the
+      connection fails. A rejected request (bad identity, token or object
+      id) is never retried. Waits 2 seconds, then 4, between attempts.
+    required: false
+    default: "3"
   cli-version:
     description: "Exact hush-hush-cli release tag to install, e.g. v1.4.2."
     required: true
@@ -81,5 +88,6 @@ runs:
         OBJECT_ID: ${{ inputs.object-id }}
         CALLER: ${{ inputs.caller }}
         CONSUMER_TOKEN: ${{ inputs.consumer-token }}
+        FETCH_ATTEMPTS: ${{ inputs.fetch-attempts }}
         DEFAULT_CALLER: "${{ github.repository }}/${{ github.workflow }}"
       run: "${{ github.action_path }}/scripts/get.sh"
