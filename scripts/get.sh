@@ -16,11 +16,36 @@ if [ -z "$caller" ]; then
   caller="${DEFAULT_CALLER:-hush-hush-action}"
 fi
 
-value="$(hush-hush-cli get "$OBJECT_ID" \
-  --server "$HUSH_HUSH_SERVER" \
-  --identity "$HUSH_HUSH_IDENTITY" \
-  --consumer-token "${CONSUMER_TOKEN:-}" \
-  --caller "$caller")"
+attempts="${FETCH_ATTEMPTS:-3}"
+case "$attempts" in
+'' | *[!0-9]* | 0)
+  echo "hush-hush-action: fetch-attempts must be a positive integer, got '$attempts'" >&2
+  exit 1
+  ;;
+esac
+
+# Only a transport failure (timeout, refused or reset connection) is worth
+# retrying: hush-hush-cli prefixes those with "call hush-hush server:". A 401,
+# 404 or any other server answer means retrying can't change the outcome.
+err_file="$(mktemp)"
+trap 'rm -f "$err_file"' EXIT
+attempt=1
+while true; do
+  if value="$(hush-hush-cli get "$OBJECT_ID" \
+    --server "$HUSH_HUSH_SERVER" \
+    --identity "$HUSH_HUSH_IDENTITY" \
+    --consumer-token "${CONSUMER_TOKEN:-}" \
+    --caller "$caller" 2>"$err_file")"; then
+    break
+  fi
+  cat "$err_file" >&2
+  if [ "$attempt" -ge "$attempts" ] || ! grep -q 'call hush-hush server:' "$err_file"; then
+    exit 1
+  fi
+  echo "hush-hush-action: fetch attempt $attempt of $attempts failed, retrying" >&2
+  sleep "$((attempt * ${RETRY_DELAY:-2}))"
+  attempt=$((attempt + 1))
+done
 
 echo "::add-mask::$value"
 
