@@ -55,3 +55,47 @@ write_masked_output() {
     printf '%s\n' "$delimiter"
   } >>"$output_file"
 }
+
+# Downloads one asset of a hush-hush-cli release to $3. $1 is the release tag
+# (e.g. v1.12.0), $2 the asset name. Tries github.com's download URL with
+# curl's own retry/backoff (5xx and timeouts, never a 404), then falls back to
+# the release-asset API, which is served from a different path and kept
+# answering while the download URL returned 504 (issue #64). A 404 is a wrong
+# tag or asset name, so it fails at once. Success needs curl to exit 0 as well
+# as a 2xx, so a body cut short mid-transfer also takes the fallback. Both
+# files are still checked by verify_checksum, so the fallback can't weaken that.
+download_release_asset() {
+  local tag="$1" name="$2" dest="$3" repo="alrayyes/hush-hush-cli"
+  local opts=(--retry 3 --retry-delay 2 --connect-timeout 10 --max-time 120)
+  local auth=() code rc=0 id meta
+  [ -n "${GITHUB_TOKEN:-}" ] && auth=(-H "Authorization: Bearer $GITHUB_TOKEN")
+  code="$(curl -sSL "${opts[@]}" -o "$dest" -w '%{http_code}' \
+    "https://github.com/$repo/releases/download/$tag/$name")" || rc=$?
+  if [ "$rc" -eq 0 ]; then
+    case "$code" in
+    2??) return 0 ;;
+    404)
+      echo "hush-hush-action: $name not found in release $tag" >&2
+      return 1
+      ;;
+    esac
+  fi
+  echo "hush-hush-action: download of $name failed (HTTP ${code:-none}, curl exit $rc), trying the release API" >&2
+  meta="$(curl -fsSL "${opts[@]}" "${auth[@]}" \
+    "https://api.github.com/repos/$repo/releases/tags/$tag")" || {
+    echo "hush-hush-action: the release API call for $tag failed too" >&2
+    return 1
+  }
+  # No jq on the runner image. Each asset's own "url" field ends in
+  # /releases/assets/<id>, and its "name" follows within a few lines, so take
+  # the id from the url line rather than depending on where "id" sits.
+  id="$(printf '%s' "$meta" | tr ',' '\n' | awk -v n="$name" '
+    match($0, /releases\/assets\/[0-9]+/) { last = substr($0, RSTART + 16, RLENGTH - 16) }
+    !done && $0 ~ "\"name\" *: *\"" n "\"" { print last; done = 1 }')"
+  if [ -z "$id" ]; then
+    echo "hush-hush-action: $name is not in the release API listing for $tag" >&2
+    return 1
+  fi
+  curl -fsSL "${opts[@]}" "${auth[@]}" -H 'Accept: application/octet-stream' \
+    -o "$dest" "https://api.github.com/repos/$repo/releases/assets/$id"
+}
