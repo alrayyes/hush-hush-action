@@ -3,7 +3,7 @@
 setup() {
   source "$BATS_TEST_DIRNAME/../scripts/lib.sh"
   stubs="$(mktemp -d)"
-  export CALLS="$stubs/calls" DIRECT_CODE=200 API_JSON_OK=1
+  export ARGS="$stubs/args" CALLS="$stubs/calls" DIRECT_CODE=200 DIRECT_RC=0 API_FAIL=""
   : >"$CALLS"
   PATH="$stubs:$PATH"
   # Fake curl: DIRECT_CODE is what github.com/.../download answers; the
@@ -11,6 +11,7 @@ setup() {
   # returns the file body.
   cat >"$stubs/curl" <<'STUB'
 #!/bin/bash
+ALLARGS="$*"
 out="" url="" fmt=""
 while [ $# -gt 0 ]; do
   case "$1" in
@@ -21,13 +22,14 @@ while [ $# -gt 0 ]; do
   shift
 done
 echo "$url" >>"$CALLS"
+echo "$ALLARGS" >>"$ARGS"
 case "$url" in
 */releases/download/*)
-  [ -n "$fmt" ] && printf '%s' "$DIRECT_CODE"
+  printf '%s' "$DIRECT_CODE"
   [ "$DIRECT_CODE" = 200 ] && echo direct >"$out"
-  [ "$DIRECT_CODE" = 200 ] || { [ -z "$fmt" ] && exit 22; }
-  exit 0 ;;
+  exit "${DIRECT_RC:-0}" ;;
 */releases/tags/*)
+  [ -n "$API_FAIL" ] && exit 22
   cat <<'JSON'
 {
   "id": 1,
@@ -89,5 +91,35 @@ teardown() {
 @test "an asset missing from the release API fails with a clear message" {
   DIRECT_CODE=504 run download_release_asset v1.12.0 nope.tar.gz "$stubs/out"
   [ "$status" -ne 0 ]
-  [[ "$output" == *"could not find nope.tar.gz"* ]]
+  [[ "$output" == *"nope.tar.gz is not in the release API listing"* ]]
+}
+
+@test "a 200 whose transfer was cut short (curl exit 18) takes the fallback" {
+  DIRECT_RC=18 run download_release_asset v1.12.0 cli.tar.gz "$stubs/out"
+  [ "$status" -eq 0 ]
+  [ "$(cat "$stubs/out")" = api ]
+}
+
+@test "no connection at all (code 000, curl exit 7) takes the fallback" {
+  DIRECT_CODE=000 DIRECT_RC=7 run download_release_asset v1.12.0 cli.tar.gz "$stubs/out"
+  [ "$status" -eq 0 ]
+  [ "$(cat "$stubs/out")" = api ]
+}
+
+@test "a failing release API call is reported as such" {
+  DIRECT_CODE=504 API_FAIL=1 run download_release_asset v1.12.0 cli.tar.gz "$stubs/out"
+  [ "$status" -ne 0 ]
+  [[ "$output" == *"release API call for v1.12.0 failed"* ]]
+}
+
+@test "the retry and timeout flags reach curl" {
+  DIRECT_CODE=504 run download_release_asset v1.12.0 cli.tar.gz "$stubs/out"
+  grep -q -- '--retry 3' "$ARGS"
+  grep -q -- '--max-time 120' "$ARGS"
+}
+
+@test "GITHUB_TOKEN is sent to the API but never to github.com" {
+  DIRECT_CODE=504 GITHUB_TOKEN=tok run download_release_asset v1.12.0 cli.tar.gz "$stubs/out"
+  [ "$status" -eq 0 ]
+  [ "$(grep -c 'Bearer tok' "$ARGS")" -eq 2 ]
 }
