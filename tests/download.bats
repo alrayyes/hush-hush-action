@@ -118,8 +118,9 @@ teardown() {
   grep -q -- '--max-time 120' "$ARGS"
 }
 
-@test "GITHUB_TOKEN is sent to the API but never to github.com" {
+@test "no Authorization header is ever sent, even with GITHUB_TOKEN set" {
   DIRECT_CODE=504 GITHUB_TOKEN=tok run download_release_asset v1.12.0 cli.tar.gz "$stubs/out"
   [ "$status" -eq 0 ]
-  [ "$(grep -c 'Bearer tok' "$ARGS")" -eq 2 ]
+  run grep -qi 'authorization' "$ARGS"
+  [ "$status" -ne 0 ]
 }

@@ -64,11 +64,12 @@ write_masked_output() {
 # tag or asset name, so it fails at once. Success needs curl to exit 0 as well
 # as a 2xx, so a body cut short mid-transfer also takes the fallback. Both
 # files are still checked by verify_checksum, so the fallback can't weaken that.
+# No credentials are sent: on Forgejo Actions GITHUB_TOKEN is the forge's own job
+# token, which api.github.com rejects with a 401 and should never receive.
 download_release_asset() {
   local tag="$1" name="$2" dest="$3" repo="alrayyes/hush-hush-cli"
   local opts=(--retry 3 --retry-delay 2 --connect-timeout 10 --max-time 120)
-  local auth=() code rc=0 id meta
-  [ -n "${GITHUB_TOKEN:-}" ] && auth=(-H "Authorization: Bearer $GITHUB_TOKEN")
+  local code rc=0 id meta
   code="$(curl -sSL "${opts[@]}" -o "$dest" -w '%{http_code}' \
     "https://github.com/$repo/releases/download/$tag/$name")" || rc=$?
   if [ "$rc" -eq 0 ]; then
@@ -81,7 +82,7 @@ download_release_asset() {
     esac
   fi
   echo "hush-hush-action: download of $name failed (HTTP ${code:-none}, curl exit $rc), trying the release API" >&2
-  meta="$(curl -fsSL "${opts[@]}" "${auth[@]}" \
+  meta="$(curl -fsSL "${opts[@]}" \
     "https://api.github.com/repos/$repo/releases/tags/$tag")" || {
     echo "hush-hush-action: the release API call for $tag failed too" >&2
     return 1
@@ -96,6 +97,6 @@ download_release_asset() {
     echo "hush-hush-action: $name is not in the release API listing for $tag" >&2
     return 1
   fi
-  curl -fsSL "${opts[@]}" "${auth[@]}" -H 'Accept: application/octet-stream' \
+  curl -fsSL "${opts[@]}" -H 'Accept: application/octet-stream' \
     -o "$dest" "https://api.github.com/repos/$repo/releases/assets/$id"
 }
