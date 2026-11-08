@@ -20,13 +20,13 @@ arch="$(map_arch "$(uname -m)")" || {
 }
 
 asset="hush-hush-cli_${version}_${os}_${arch}.tar.gz"
-base_url="https://github.com/alrayyes/hush-hush-cli/releases/download/v${version}"
+tag="v${version}"
 
 workdir="$(mktemp -d)"
 trap 'rm -rf "$workdir"' EXIT
 
-curl -fsSL -o "$workdir/$asset" "$base_url/$asset"
-curl -fsSL -o "$workdir/checksums.txt" "$base_url/checksums.txt"
+download_release_asset "$tag" "$asset" "$workdir/$asset"
+download_release_asset "$tag" checksums.txt "$workdir/checksums.txt"
 
 verify_checksum "$workdir/$asset" "$workdir/checksums.txt"
 

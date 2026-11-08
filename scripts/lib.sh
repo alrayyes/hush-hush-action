@@ -55,3 +55,35 @@ write_masked_output() {
     printf '%s\n' "$delimiter"
   } >>"$output_file"
 }
+
+# Downloads one asset of a hush-hush-cli release to $3. $1 is the release tag
+# (e.g. v1.12.0), $2 the asset name. Tries github.com's download URL with
+# curl's own retry/backoff (which covers 5xx and timeouts, never a 404), then
+# falls back to the release-asset API, which is served from a different path
+# and kept answering while the download URL returned 504 (issue #64). A 404 is
+# a wrong tag or asset name, so it fails at once instead of being papered over.
+download_release_asset() {
+  local tag="$1" name="$2" dest="$3" repo="${HHC_REPO:-alrayyes/hush-hush-cli}"
+  local code id
+  code="$(curl -sSL --retry 3 --retry-delay 2 -o "$dest" -w '%{http_code}' \
+    "https://github.com/$repo/releases/download/$tag/$name" || true)"
+  case "$code" in
+  2??) return 0 ;;
+  404)
+    echo "hush-hush-action: $name not found in release $tag" >&2
+    return 1
+    ;;
+  esac
+  echo "hush-hush-action: download of $name failed (HTTP ${code:-none}), trying the release API" >&2
+  id="$(curl -fsSL --retry 3 --retry-delay 2 "https://api.github.com/repos/$repo/releases/tags/$tag" |
+    tr ',' '\n' |
+    awk -v n="\"name\": \"$name\"" '
+      /^[[:space:]]*"id":/ { gsub(/[^0-9]/, "", $0); last = $0 }
+      !done && index($0, n) { print last; done = 1 }' || true)"
+  if [ -z "$id" ]; then
+    echo "hush-hush-action: could not find $name in the release API for $tag" >&2
+    return 1
+  fi
+  curl -fsSL --retry 3 --retry-delay 2 -H 'Accept: application/octet-stream' \
+    -o "$dest" "https://api.github.com/repos/$repo/releases/assets/$id"
+}
