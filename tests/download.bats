@@ -114,8 +114,13 @@ teardown() {
 
 @test "the retry and timeout flags reach curl" {
   DIRECT_CODE=504 run download_release_asset v1.12.0 cli.tar.gz "$stubs/out"
-  grep -q -- '--retry 3' "$ARGS"
-  grep -q -- '--max-time 120' "$ARGS"
+  # direct try: short, so a hung github.com can't outlast the job
+  head -1 "$ARGS" | grep -q -- '--max-time 20 '
+  head -1 "$ARGS" | grep -q -- '--retry 2 '
+  # fallback calls: longer leash
+  [ "$(tail -n +2 "$ARGS" | grep -c -- '--retry 2 .*--max-time 30 ')" -eq 2 ]
+  run grep -q -- '--max-time 120' "$ARGS"
+  [ "$status" -ne 0 ]
 }
 
 @test "no Authorization header is ever sent, even with GITHUB_TOKEN set" {
