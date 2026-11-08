@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.2](https://github.com/alrayyes/hush-hush-action/compare/v1.6.1...v1.6.2) (2026-11-08)
+
+
+### Bug Fixes
+
+* never send GITHUB_TOKEN to api.github.com ([#68](https://github.com/alrayyes/hush-hush-action/issues/68)) ([c018b06](https://github.com/alrayyes/hush-hush-action/commit/c018b063f73d9ef75337cf40c22297ea041f7689)), closes [#67](https://github.com/alrayyes/hush-hush-action/issues/67)
+
 ## [1.6.1](https://github.com/alrayyes/hush-hush-action/compare/v1.6.0...v1.6.1) (2026-11-08)
 
 
