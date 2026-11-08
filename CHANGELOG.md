@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.1](https://github.com/alrayyes/hush-hush-action/compare/v1.6.0...v1.6.1) (2026-11-08)
+
+
+### Bug Fixes
+
+* retry the CLI download and fall back to the release API ([#65](https://github.com/alrayyes/hush-hush-action/issues/65)) ([6ead371](https://github.com/alrayyes/hush-hush-action/commit/6ead371f1bdb83ebf2bde61270d5130c3641b674))
+
 ## [1.6.0](https://github.com/alrayyes/hush-hush-action/compare/v1.5.2...v1.6.0) (2026-10-26)
 
 
