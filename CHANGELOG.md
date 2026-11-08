@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.3](https://github.com/alrayyes/hush-hush-action/compare/v1.6.2...v1.6.3) (2026-11-08)
+
+
+### Bug Fixes
+
+* cap the direct download near a minute so the fallback runs ([#71](https://github.com/alrayyes/hush-hush-action/issues/71)) ([819820f](https://github.com/alrayyes/hush-hush-action/commit/819820f162f8d272bf46d10a0dbd79d191d383e0))
+
 ## [1.6.2](https://github.com/alrayyes/hush-hush-action/compare/v1.6.1...v1.6.2) (2026-11-08)
 
 
