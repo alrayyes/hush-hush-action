@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.4](https://github.com/alrayyes/hush-hush-action/compare/v1.6.3...v1.6.4) (2026-11-11)
+
+
+### Bug Fixes
+
+* retry HTTP 5xx answers from the hush-hush server ([#75](https://github.com/alrayyes/hush-hush-action/issues/75)) ([d783184](https://github.com/alrayyes/hush-hush-action/commit/d7831840777d6fba4644db80d113255f147be4e5)), closes [#74](https://github.com/alrayyes/hush-hush-action/issues/74)
+
 ## [1.6.3](https://github.com/alrayyes/hush-hush-action/compare/v1.6.2...v1.6.3) (2026-11-08)
 
 
