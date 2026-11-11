@@ -24,9 +24,12 @@ case "$attempts" in
   ;;
 esac
 
-# Only a transport failure (timeout, refused or reset connection) is worth
-# retrying: hush-hush-cli prefixes those with "call hush-hush server:". A 401,
-# 404 or any other server answer means retrying can't change the outcome.
+# Two failures are worth retrying, because a busy server usually recovers
+# within seconds: a transport failure (timeout, refused or reset connection),
+# which hush-hush-cli prefixes with "call hush-hush server:", and an HTTP 5xx
+# answer, which it reports as "unexpected status 5xx". A 401, 403, 404 or any
+# other 4xx means retrying can't change the outcome.
+retryable='call hush-hush server:|unexpected status 5[0-9][0-9]'
 err_file="$(mktemp)"
 trap 'rm -f "$err_file"' EXIT
 attempt=1
@@ -40,7 +43,7 @@ while true; do
     break
   fi
   cat "$err_file" >&2
-  if [ "$attempt" -ge "$attempts" ] || ! grep -q 'call hush-hush server:' "$err_file"; then
+  if [ "$attempt" -ge "$attempts" ] || ! grep -qE "$retryable" "$err_file"; then
     exit 1
   fi
   echo "hush-hush-action: fetch attempt $attempt of $attempts failed, retrying" >&2

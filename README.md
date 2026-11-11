@@ -58,15 +58,15 @@ On Forgejo, reference it by full URL instead:
 
 ### Inputs
 
-| Input            | Required | Description                                                                                                                        |
-| ---------------- | -------- | ---------------------------------------------------------------------------------------------------------------------------------- |
-| `server`         | yes      | Base URL of the hush-hush server.                                                                                                  |
-| `identity`       | yes      | Age private key that can decrypt the object. Pass it from a repo secret, never a literal.                                          |
-| `object-id`      | yes      | The hush-hush object id to fetch.                                                                                                  |
-| `caller`         | no       | Self-reported `X-Caller` label recorded in hush-hush's audit log. Defaults to `<repository>/<workflow>`.                           |
-| `consumer-token` | no       | Read-only, consumer-scoped bearer token. hush-hush rejects the fetch without one - pass it from a repo secret.                     |
-| `fetch-attempts` | no       | Tries before a timeout or connection error fails the step. Default `3`, waiting 2 then 4 seconds. A 401, 403 or 404 never retries. |
-| `cli-version`    | yes      | Exact `hush-hush-cli` release tag to install, for example `v1.10.2`.                                                               |
+| Input            | Required | Description                                                                                                                                                                                                  |
+| ---------------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ |
+| `server`         | yes      | Base URL of the hush-hush server.                                                                                                                                                                            |
+| `identity`       | yes      | Age private key that can decrypt the object. Pass it from a repo secret, never a literal.                                                                                                                    |
+| `object-id`      | yes      | The hush-hush object id to fetch.                                                                                                                                                                            |
+| `caller`         | no       | Self-reported `X-Caller` label recorded in hush-hush's audit log. Defaults to `<repository>/<workflow>`.                                                                                                     |
+| `consumer-token` | no       | Read-only, consumer-scoped bearer token. hush-hush rejects the fetch without one - pass it from a repo secret.                                                                                               |
+| `fetch-attempts` | no       | Tries before a failure ends the step. A timeout, a connection error or an HTTP 5xx answer from the server is retried. Default `3`, waiting 2 then 4 seconds. A 401, 403, 404 or any other 4xx never retries. |
+| `cli-version`    | yes      | Exact `hush-hush-cli` release tag to install, for example `v1.10.2`.                                                                                                                                         |
 
 ### Outputs
 
