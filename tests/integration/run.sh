@@ -226,11 +226,19 @@ git -C "$fixture" remote add origin "http://testadmin:$forgejo_token@localhost:$
 git -C "$fixture" push -q origin main
 
 echo "==> waiting for the run to finish"
+# The tasks endpoint lists one entry per fixture job. Judge all of them: any
+# failure fails the run, and success needs every job in, not just the newest.
+fixture_jobs=2
 status=""
 for _ in $(seq 1 60); do
   status="$(curl -sf "http://localhost:$forgejo_port/api/v1/repos/testadmin/fixture/actions/tasks" \
-    -H "Authorization: token $forgejo_token" | jq -r '.workflow_runs[0].status // empty')"
-  [ "$status" = "success" ] || [ "$status" = "failure" ] && break
+    -H "Authorization: token $forgejo_token" |
+    jq -r --argjson n "$fixture_jobs" '
+      (.workflow_runs // []) | map(.status) as $s
+      | if any($s[]; . == "failure" or . == "cancelled") then "failure"
+        elif ($s | length) >= $n and all($s[]; . == "success" or . == "skipped") then "success"
+        else empty end')"
+  [ -n "$status" ] && break
   sleep 3
 done
 
