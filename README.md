@@ -30,7 +30,8 @@ before either can reach a log.
 - The runner is Linux or macOS, amd64 or arm64 - `hush-hush-cli` ships no
   Windows release this action installs.
 - The exact `hush-hush-cli` release tag you want installed (`cli-version`) -
-  v1.11.0 or newer, for `consumer-token` support. See
+  v1.11.0 or newer, because the action always passes `--consumer-token`. An
+  older tag fails during installation with a message saying so. See
   [its releases](https://github.com/alrayyes/hush-hush-cli/releases).
 
 ## Usage
