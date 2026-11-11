@@ -127,3 +127,10 @@ STUB
   [ "$(cat "$COUNT_FILE")" -eq 1 ]
   [[ "$output" != *"retrying"* ]]
 }
+
+@test "a 4xx whose message quotes a 5xx is not retried" {
+  stub_cli 'get: fetch object: unexpected status 400: unexpected status 503 from upstream' 9
+  run "$script"
+  [ "$status" -ne 0 ]
+  [ "$(cat "$COUNT_FILE")" -eq 1 ]
+}

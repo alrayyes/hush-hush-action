@@ -28,8 +28,11 @@ esac
 # within seconds: a transport failure (timeout, refused or reset connection),
 # which hush-hush-cli prefixes with "call hush-hush server:", and an HTTP 5xx
 # answer, which it reports as "unexpected status 5xx". A 401, 403, 404 or any
-# other 4xx means retrying can't change the outcome.
-retryable='call hush-hush server:|unexpected status 5[0-9][0-9]'
+# other 4xx means retrying can't change the outcome. The wording comes from
+# mapError in hush-hush-cli's internal/client/client.go; if it changes, so
+# must this pattern. It is anchored so a 4xx whose server message quotes
+# "unexpected status 503" doesn't match.
+retryable='(^|: )(call hush-hush server:|unexpected status 5[0-9][0-9]($|:))'
 err_file="$(mktemp)"
 trap 'rm -f "$err_file"' EXIT
 attempt=1

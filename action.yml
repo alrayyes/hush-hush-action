@@ -42,7 +42,8 @@ inputs:
     description: >-
       How many times to try the fetch when the server times out, the
       connection fails or the server answers with an HTTP 5xx. A rejected
-      request (bad identity, token or object id) is never retried. Waits 2 seconds, then 4, between attempts.
+      request (bad identity, token or object id) is never retried. Waits 2
+      seconds, then 4, between attempts.
     required: false
     default: "3"
   cli-version:
