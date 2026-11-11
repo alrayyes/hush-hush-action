@@ -20,7 +20,7 @@ net="hh-it-$$"
 HUSH_HUSH_IMAGE="ghcr.io/alrayyes/hush-hush@sha256:72fe50a390b1ade923683af45ec7685807628301d8ebd84641ecff67289a219c" # 2.40.1
 FORGEJO_IMAGE="code.forgejo.org/forgejo/forgejo@sha256:3c34f11fe8b9983096eef3f8f25c2d2c21c4ae7504960cb203f0b075d1d8ed73" # 9.0.3
 RUNNER_IMAGE="code.forgejo.org/forgejo/runner@sha256:fb38cf65183f935821b930de7bd27c303aa188d297be709c762dae564f838402" # 9.1.1
-HHC_VERSION="v1.10.2" # first version with --consumer-token support
+HHC_VERSION="v1.11.0" # first release with --consumer-token (cmd/hush-hush-cli/main.go)
 TEST_SECRET_VALUE="runner-e2e-secret-value"
 
 cleanup() {
@@ -226,11 +226,19 @@ git -C "$fixture" remote add origin "http://testadmin:$forgejo_token@localhost:$
 git -C "$fixture" push -q origin main
 
 echo "==> waiting for the run to finish"
+# The tasks endpoint lists one entry per fixture job. Judge all of them: any
+# failure fails the run, and success needs every job in, not just the newest.
+fixture_jobs=2
 status=""
 for _ in $(seq 1 60); do
   status="$(curl -sf "http://localhost:$forgejo_port/api/v1/repos/testadmin/fixture/actions/tasks" \
-    -H "Authorization: token $forgejo_token" | jq -r '.workflow_runs[0].status // empty')"
-  [ "$status" = "success" ] || [ "$status" = "failure" ] && break
+    -H "Authorization: token $forgejo_token" |
+    jq -r --argjson n "$fixture_jobs" '
+      (.workflow_runs // []) | map(.status) as $s
+      | if any($s[]; . == "failure" or . == "cancelled") then "failure"
+        elif ($s | length) >= $n and all($s[]; . == "success" or . == "skipped") then "success"
+        else empty end')"
+  [ -n "$status" ] && break
   sleep 3
 done
 
