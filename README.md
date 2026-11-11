@@ -31,7 +31,7 @@ before either can reach a log.
   Windows release this action installs.
 - The exact `hush-hush-cli` release tag you want installed (`cli-version`) -
   v1.11.0 or newer, because the action always passes `--consumer-token`. An
-  older tag fails the install step with a message saying so. See
+  older tag fails during installation with a message saying so. See
   [its releases](https://github.com/alrayyes/hush-hush-cli/releases).
 
 ## Usage
