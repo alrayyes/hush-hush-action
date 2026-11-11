@@ -103,7 +103,8 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
   server, a real Forgejo instance, and a real Forgejo Actions runner, all in
   Docker. Pushes a fixture repo that uses this action via `uses: ./` and
   asserts the run actually succeeds with the right value. Needs `docker`,
-  `curl`, `jq`, `age-keygen`, and `git`. This is also what exercises
+  `curl`, `jq`, `age-keygen`, and `git`, plus `zstd` to print the fixture
+  job's step logs when it fails. This is also what exercises
   `scripts/install.sh` and `scripts/get.sh` - the coverage below doesn't
   measure them.
 - `tests/coverage.sh` - line coverage for `scripts/lib.sh` via `kcov`,

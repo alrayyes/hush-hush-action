@@ -4,7 +4,8 @@
 # mocked runner behavior. Pushes a fixture repo that uses this action via
 # `uses: ./` and asserts the run actually succeeds with the right value.
 #
-# Requires: docker, curl, jq, age-keygen, git. Run from the repo root:
+# Requires: docker, curl, jq, age-keygen, git, zstd (to read job logs on a
+# failure). Run from the repo root:
 #   tests/integration/run.sh
 set -euo pipefail
 
@@ -31,6 +32,27 @@ cleanup() {
   exit "$status"
 }
 trap cleanup EXIT
+
+# Forgejo 9 has no API for job logs, but it writes each task's output under
+# its data directory. Print them, so a failed fixture shows its step output
+# and not only the runner daemon's view.
+dump_fixture_logs() {
+  local f local_copy
+  echo "--- fixture job logs ---" >&2
+  docker exec "hh-it-forgejo-$$" find /data -path '*actions_log*' -type f 2>/dev/null |
+    sort | while read -r f; do
+      echo "=== $f" >&2
+      local_copy="$work/$(basename "$f")"
+      docker cp "hh-it-forgejo-$$:$f" "$local_copy" >/dev/null 2>&1 || {
+        echo "(could not copy)" >&2
+        continue
+      }
+      case "$f" in
+      *.zst) zstd -dc "$local_copy" 2>&1 | tail -n 60 >&2 ;;
+      *) tail -n 60 "$local_copy" >&2 ;;
+      esac
+    done
+}
 
 echo "==> network"
 docker network create "$net" >/dev/null
@@ -205,6 +227,7 @@ done
 if [ "$status" != "success" ]; then
   echo "fixture workflow did not succeed (status: ${status:-unknown})" >&2
   docker logs "hh-it-runner-$$" 2>&1 | tail -100 >&2
+  dump_fixture_logs
   exit 1
 fi
 
