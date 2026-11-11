@@ -37,21 +37,31 @@ trap cleanup EXIT
 # its data directory. Print them, so a failed fixture shows its step output
 # and not only the runner daemon's view.
 dump_fixture_logs() {
-  local f local_copy
+  local f local_copy files
   echo "--- fixture job logs ---" >&2
-  docker exec "hh-it-forgejo-$$" find /data -path '*actions_log*' -type f 2>/dev/null |
-    sort | while read -r f; do
-      echo "=== $f" >&2
-      local_copy="$work/$(basename "$f")"
-      docker cp "hh-it-forgejo-$$:$f" "$local_copy" >/dev/null 2>&1 || {
-        echo "(could not copy)" >&2
-        continue
-      }
-      case "$f" in
-      *.zst) zstd -dc "$local_copy" 2>&1 | tail -n 60 >&2 ;;
-      *) tail -n 60 "$local_copy" >&2 ;;
-      esac
-    done
+  # The runner uploads logs in batches; give the last one a moment to land.
+  sleep 5
+  files="$(docker exec "hh-it-forgejo-$$" find /data -path '*actions_log*' -type f | sort)" || {
+    echo "(could not list the job logs in the forgejo container)" >&2
+    return 1
+  }
+  if [ -z "$files" ]; then
+    echo "(no job logs found; what forgejo has under /data/gitea:)" >&2
+    docker exec "hh-it-forgejo-$$" ls -R /data/gitea 2>&1 | head -40 >&2
+    return 0
+  fi
+  while read -r f; do
+    echo "=== $f" >&2
+    local_copy="$work/$(basename "$f")"
+    docker cp "hh-it-forgejo-$$:$f" "$local_copy" >/dev/null || {
+      echo "(could not copy)" >&2
+      continue
+    }
+    case "$f" in
+    *.zst) zstd -dc "$local_copy" 2>&1 | tail -n 60 >&2 ;;
+    *) tail -n 60 "$local_copy" >&2 ;;
+    esac
+  done <<<"$files"
 }
 
 echo "==> network"
