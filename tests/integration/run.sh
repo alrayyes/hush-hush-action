@@ -227,7 +227,7 @@ done
 if [ "$status" != "success" ]; then
   echo "fixture workflow did not succeed (status: ${status:-unknown})" >&2
   docker logs "hh-it-runner-$$" 2>&1 | tail -100 >&2
-  dump_fixture_logs
+  dump_fixture_logs || true # a broken dump must not change the exit code below
   exit 1
 fi
 
