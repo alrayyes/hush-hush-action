@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.6](https://github.com/alrayyes/hush-hush-action/compare/v1.6.5...v1.6.6) (2026-11-11)
+
+
+### Bug Fixes
+
+* fail early when cli-version predates --consumer-token ([#86](https://github.com/alrayyes/hush-hush-action/issues/86)) ([e31018a](https://github.com/alrayyes/hush-hush-action/commit/e31018aa81317696800a110537b27970587fa7ba)), closes [#85](https://github.com/alrayyes/hush-hush-action/issues/85)
+
 ## [1.6.5](https://github.com/alrayyes/hush-hush-action/compare/v1.6.4...v1.6.5) (2026-11-11)
 
 
