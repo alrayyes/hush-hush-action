@@ -92,3 +92,29 @@ teardown() {
   delimiter_b="$(head -n1 "$out_b")"
   [ "$delimiter_a" != "$delimiter_b" ]
 }
+
+@test "require_min_version rejects a version below the minimum" {
+  run require_min_version 1.10.2
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"v1.10.2 is too old"* ]]
+  [[ "$output" == *"v1.11.0 or newer"* ]]
+}
+
+@test "require_min_version compares numerically, not as strings" {
+  run require_min_version 1.9.0
+  [ "$status" -eq 1 ]
+}
+
+@test "require_min_version accepts the minimum and anything newer" {
+  for v in 1.11.0 1.11.1 1.12.0 1.19.0 2.0.0 10.0.0; do
+    run require_min_version "$v"
+    [ "$status" -eq 0 ]
+  done
+}
+
+@test "require_min_version leaves a value that isn't X.Y.Z to the download step" {
+  for v in latest 1.11 1.11.0-rc1 ""; do
+    run require_min_version "$v"
+    [ "$status" -eq 0 ]
+  done
+}
