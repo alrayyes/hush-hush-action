@@ -35,7 +35,7 @@ inputs:
       identity above, this is a further access-control check on top of
       it. Treat this the same as the identity - pass it from a repo
       secret, never a literal value in the workflow file. Requires
-      hush-hush-cli v1.10.2 or newer (cli-version).
+      hush-hush-cli v1.11.0 or newer (cli-version).
     required: false
     default: ""
   fetch-attempts:

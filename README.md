@@ -30,7 +30,7 @@ before either can reach a log.
 - The runner is Linux or macOS, amd64 or arm64 - `hush-hush-cli` ships no
   Windows release this action installs.
 - The exact `hush-hush-cli` release tag you want installed (`cli-version`) -
-  v1.10.2 or newer, for `consumer-token` support. See
+  v1.11.0 or newer, for `consumer-token` support. See
   [its releases](https://github.com/alrayyes/hush-hush-cli/releases).
 
 ## Usage
@@ -43,7 +43,7 @@ before either can reach a log.
     identity: ${{ secrets.HUSH_HUSH_IDENTITY }}
     object-id: prod_deploy_webhook
     consumer-token: ${{ secrets.HUSH_HUSH_CONSUMER_TOKEN }}
-    cli-version: v1.10.2
+    cli-version: v1.11.0
 
 - run: curl -X POST "$WEBHOOK"
   env:
@@ -66,7 +66,7 @@ On Forgejo, reference it by full URL instead:
 | `caller`         | no       | Self-reported `X-Caller` label recorded in hush-hush's audit log. Defaults to `<repository>/<workflow>`.                                                                                                     |
 | `consumer-token` | no       | Read-only, consumer-scoped bearer token. hush-hush rejects the fetch without one - pass it from a repo secret.                                                                                               |
 | `fetch-attempts` | no       | Tries before a failure ends the step. A timeout, a connection error or an HTTP 5xx answer from the server is retried. Default `3`, waiting 2 then 4 seconds. A 401, 403, 404 or any other 4xx never retries. |
-| `cli-version`    | yes      | Exact `hush-hush-cli` release tag to install, for example `v1.10.2`.                                                                                                                                         |
+| `cli-version`    | yes      | Exact `hush-hush-cli` release tag to install, for example `v1.11.0`.                                                                                                                                         |
 
 ### Outputs
 
