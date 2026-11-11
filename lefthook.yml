@@ -43,26 +43,36 @@ commit-msg:
 # every run - both take over a minute, versus low single-digit seconds for
 # everything else here. Run either by hand before a push that touches
 # action.yml or scripts/ - CI runs both unconditionally either way.
+#
+# Two groups, not one parallel list. vale and ltex start Docker containers, and
+# firejail (the wrapper that shadows shellcheck on the author's host, and that
+# actionlint spawns per workflow script) aborts with "invalid whitelist mount"
+# when it starts while Docker is creating or removing a container's mounts.
+# The containers run after the firejail jobs finish.
 pre-push:
-  parallel: true
   jobs:
-    - name: shellcheck
-      run: shellcheck -x scripts/*.sh tests/integration/*.sh tests/coverage.sh
+    - group:
+        parallel: true
+        jobs:
+          - name: shellcheck
+            run: shellcheck -x scripts/*.sh tests/integration/*.sh tests/coverage.sh
 
-    - name: actionlint
-      run: actionlint
+          - name: actionlint
+            run: actionlint
 
-    - name: bats
-      run: bats tests/*.bats
+          - name: bats
+            run: bats tests/*.bats
 
-    - name: prettier
-      run: bun run format:check
+          - name: prettier
+            run: bun run format:check
 
-    - name: markdownlint
-      run: bun run lint:md
+          - name: markdownlint
+            run: bun run lint:md
 
-    - name: vale
-      run: ./scripts/lint-vale.sh
+    - group:
+        jobs:
+          - name: vale
+            run: ./scripts/lint-vale.sh
 
-    - name: ltex
-      run: ./scripts/lint-ltex.sh
+          - name: ltex
+            run: ./scripts/lint-ltex.sh
