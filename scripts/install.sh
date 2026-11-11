@@ -9,6 +9,7 @@ source "$script_dir/lib.sh"
 
 version="${HHC_VERSION:?HHC_VERSION is required}"
 version="${version#v}"
+require_min_version "$version"
 
 os="$(map_os "$(uname -s)")" || {
   echo "hush-hush-action: unsupported OS: $(uname -s)" >&2

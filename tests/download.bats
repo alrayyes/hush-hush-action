@@ -129,3 +129,10 @@ teardown() {
   run grep -qi 'authorization' "$ARGS"
   [ "$status" -ne 0 ]
 }
+
+@test "install.sh stops on a too-old cli-version before downloading anything" {
+  HHC_VERSION=v1.10.2 run "$BATS_TEST_DIRNAME/../scripts/install.sh"
+  [ "$status" -eq 1 ]
+  [[ "$output" == *"v1.10.2 is too old"* ]]
+  [ ! -s "$CALLS" ]
+}

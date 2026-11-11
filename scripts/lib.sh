@@ -104,3 +104,25 @@ download_release_asset() {
   curl -fsSL "${api[@]}" -H 'Accept: application/octet-stream' \
     -o "$dest" "https://api.github.com/repos/$repo/releases/assets/$id"
 }
+
+# The oldest hush-hush-cli this action can drive. get.sh always passes
+# --consumer-token, and v1.11.0 is the first release that has the flag
+# (cmd/hush-hush-cli/main.go); v1.10.2 does not.
+MIN_CLI_VERSION="1.11.0"
+
+# Fails with a message that names the cause when $1 (a version without the
+# leading "v") is older than MIN_CLI_VERSION. A value that isn't X.Y.Z is not
+# judged here: the download step reports a tag that doesn't exist.
+require_min_version() {
+  local version="$1" a b c x y z
+  [[ "$version" =~ ^([0-9]+)\.([0-9]+)\.([0-9]+)$ ]] || return 0
+  a="${BASH_REMATCH[1]}" b="${BASH_REMATCH[2]}" c="${BASH_REMATCH[3]}"
+  IFS=. read -r x y z <<<"$MIN_CLI_VERSION"
+  if [ "$a" -gt "$x" ] ||
+    { [ "$a" -eq "$x" ] && [ "$b" -gt "$y" ]; } ||
+    { [ "$a" -eq "$x" ] && [ "$b" -eq "$y" ] && [ "$c" -ge "$z" ]; }; then
+    return 0
+  fi
+  echo "hush-hush-action: hush-hush-cli v$version is too old; v$MIN_CLI_VERSION or newer is required (it added --consumer-token). Raise cli-version." >&2
+  return 1
+}
