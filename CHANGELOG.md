@@ -1,5 +1,12 @@
 # Changelog
 
+## [1.6.5](https://github.com/alrayyes/hush-hush-action/compare/v1.6.4...v1.6.5) (2026-11-11)
+
+
+### Bug Fixes
+
+* anchor the 5xx retry match and re-wrap the input description ([#77](https://github.com/alrayyes/hush-hush-action/issues/77)) ([eb89317](https://github.com/alrayyes/hush-hush-action/commit/eb893177d5856d37381fb79e0c55d73539cb9d73))
+
 ## [1.6.4](https://github.com/alrayyes/hush-hush-action/compare/v1.6.3...v1.6.4) (2026-11-11)
 
 
