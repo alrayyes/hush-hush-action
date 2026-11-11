@@ -96,3 +96,34 @@ STUB
   [ "$status" -ne 0 ]
   [[ "$output" == *"fetch-attempts must be a positive integer"* ]]
 }
+
+@test "a 500 then a success ends successfully and outputs the value" {
+  stub_cli 'get: fetch object: unexpected status 500: internal error' 1
+  run "$script"
+  [ "$status" -eq 0 ]
+  [ "$(cat "$COUNT_FILE")" -eq 2 ]
+  [[ "$output" == *"fetch attempt 1 of 3 failed, retrying"* ]]
+  grep -q s3cret "$GITHUB_OUTPUT"
+}
+
+@test "a 504 with no message is retried" {
+  stub_cli 'get: fetch object: unexpected status 504' 1
+  run "$script"
+  [ "$status" -eq 0 ]
+  [ "$(cat "$COUNT_FILE")" -eq 2 ]
+}
+
+@test "persistent 5xx answers fail after the last attempt" {
+  stub_cli 'get: fetch object: unexpected status 503: unavailable' 9
+  FETCH_ATTEMPTS=3 run "$script"
+  [ "$status" -ne 0 ]
+  [ "$(cat "$COUNT_FILE")" -eq 3 ]
+}
+
+@test "an unexpected 4xx other than 401, 403 and 404 is not retried" {
+  stub_cli 'get: fetch object: unexpected status 429: slow down' 9
+  run "$script"
+  [ "$status" -ne 0 ]
+  [ "$(cat "$COUNT_FILE")" -eq 1 ]
+  [[ "$output" != *"retrying"* ]]
+}
